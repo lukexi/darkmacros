@@ -129,6 +129,9 @@ And we're done!
 
 */
 
+// Given a realtalk array like { "nvgMoveTo", 123, 456 },
+// finds the appropriate function pointer in the NVGFunctions
+// vtable and calls it.
 void CallRTNVGFunc(rt_state* rt, void* NVG, rt_ref FuncRef) {
 
     const char* FuncName = rt_ref_to_string(rt,
@@ -144,6 +147,9 @@ void CallRTNVGFunc(rt_state* rt, void* NVG, rt_ref FuncRef) {
     }
 }
 
+// Create a realtalk array representing a nanovg
+// function like: { "nvgMoveTo", 123, 456 }
+// and use CallRTNVGFunction to call it.
 int main(int argc, char const *argv[])
 {
     rt_state* rt = rt_create_state(NULL);
@@ -159,8 +165,9 @@ int main(int argc, char const *argv[])
     CallRTNVGFunc(rt, NVG, FuncRef);
 
     // Calls
-    // nvgMoveTo_rt(rt, array_ref, NVG);
-    // which in turn calls nvgMoveTo.
+    // nvgMoveTo_rt(rt, FuncRef, NVG);
+    // which in turn calls nvgMoveTo
+    // with arguments extracted from FuncRef.
 
     return 0;
 }
