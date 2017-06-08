@@ -1,0 +1,2 @@
+#!/bin/sh
+ls *.c | entr -s 'make && ./darkmacro'
