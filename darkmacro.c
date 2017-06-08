@@ -19,20 +19,20 @@ void nvgSetFont(void* ctx, char* a, float b) {
     printf("nvgMoveTo %p %s %f\n", ctx, a, b);
 }
 
-char* getString(void* rt) {
+char* getString(rt_state* rt) {
     return "foo";
 }
-float getFloat(void* rt) {
+float getFloat(rt_state* rt) {
     return 123.4;
 }
 
 /*
-void nvgBeginPath_rt(void* rt, void* ctx) {
+void nvgBeginPath_rt(rt_state* rt, void* ctx) {
     nvgBeginPath(ctx
         );
 }
 
-void nvgMoveTo_rt(void* rt, void* ctx) {
+void nvgMoveTo_rt(rt_state* rt, void* ctx) {
     nvgMoveTo(ctx
         , getFloat(rt)
         , getFloat(rt)
@@ -42,22 +42,26 @@ void nvgMoveTo_rt(void* rt, void* ctx) {
 
 
 #define BEGIN(name) \
-void name##_rt(void* rt, void* ctx) { \
-    int i = 0; \
-    name(ctx
-#define FLOAT , getFloat(rt)
-#define STRING , getString(rt)
-#define END ); printf("final result %d\n", i); };
-BEGIN(nvgMoveTo) FLOAT FLOAT END
+void name##_rt(rt_state* rt, rt_ref args, void* nvg) { \
+    name(nvg
+#define FLOAT(i) , rt_ref_to_number(rt, rt_get_value_at_index(rt, args, i))
+#define STRING(i) , rt_ref_to_string(rt, rt_get_value_at_index(rt, args, i))
+#define END ); };
+BEGIN(nvgMoveTo) FLOAT(0) FLOAT(1) END
 
 int main(int argc, char const *argv[])
 {
     rt_state* rt = rt_create_state(NULL);
 
-    rt_ref ref1 = rt_ref_from_cstring(rt, "foo");
+    rt_ref fields[] = {
+        // rt_ref_from_cstring(rt, "you found me!"),
+        rt_ref_from_number(rt, 123),
+        rt_ref_from_number(rt, 456)
+    };
+    rt_ref array_ref = rt_ref_for_array(rt, fields, ArrayLength(fields));
 
     printf("Hi\n");
-    nvgMoveTo_rt(NULL, NULL);
+    nvgMoveTo_rt(rt, array_ref, NULL);
 
     return 0;
 }
